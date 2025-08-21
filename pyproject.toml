@@ -1,0 +1,327 @@
+# Modern Python packaging configuration following PEP 621 standards
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trigdroid"
+version = "2.0.0"
+description = "Android Sandbox Payload Trigger Framework for Security Research"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Daniel Baier", email = "daniel.baier@fkie.fraunhofer.de"},
+    {name = "Simon Hüsch", email = "simon.huesch@smail.inf.h-brs.de"},
+]
+maintainers = [
+    {name = "TrigDroid Team", email = "contact@trigdroid.org"},
+]
+keywords = [
+    "android",
+    "security", 
+    "malware-analysis",
+    "frida",
+    "mobile-security",
+    "penetration-testing",
+    "reverse-engineering"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Other Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux", 
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: JavaScript",
+    "Topic :: Security",
+    "Topic :: Software Development :: Testing",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+requires-python = ">=3.9"
+
+# Core dependencies required for basic functionality
+dependencies = [
+    "PyYAML>=6.0",
+    "requests>=2.31.0", 
+    "colorama>=0.4.6",
+    "termcolor>=2.3.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+# Frida instrumentation support
+frida = [
+    "frida>=16.0.0",
+    "frida-tools>=12.0.0",
+]
+
+# Full feature set including all optional components
+full = [
+    "frida>=16.0.0", 
+    "frida-tools>=12.0.0",
+    "numpy>=1.24.0",
+    "Pillow>=9.0.0",
+    "selenium>=4.0.0",
+    "appium-python-client>=3.0.0",
+]
+
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.12.0", 
+    "mypy>=1.0.0",
+    "pylint>=2.17.0",
+    "pre-commit>=3.0.0",
+    "types-PyYAML>=6.0.0",
+    "types-requests>=2.31.0",
+]
+
+# Documentation dependencies
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocs-click>=0.8.0",
+    "mkdocstrings[python]>=0.22.0",
+]
+
+# Testing dependencies
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "pytest-asyncio>=0.21.0",
+    "coverage[toml]>=7.0.0",
+]
+
+# Linting and formatting
+lint = [
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0", 
+    "pylint>=2.17.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/fkie-cad/Sandroid_TrigDroid"
+Documentation = "https://fkie-cad/Sandroid_TrigDroid"
+Repository = "https://github.com/fkie-cad/Sandroid_TrigDroid.git"
+"Bug Tracker" = "https://github.com/fkie-cad/Sandroid_TrigDroid/issues"
+Changelog = "https://github.com/fkie-cad/Sandroid_TrigDroid/blob/main/CHANGELOG.md"
+
+# CLI entry points
+[project.scripts]
+trigdroid = "trigdroid.cli.main:main"
+trigdroid-legacy = "TrigDroid.__main__:main"
+
+# Python entry points for programmatic access  
+[project.entry-points."trigdroid.test_runners"]
+frida = "TrigDroid_Infrastructure.test_runners.frida_test_runner:FridaTestRunner"
+sensor = "TrigDroid_Infrastructure.test_runners.sensor_test_runner:SensorTestRunner"
+
+[project.entry-points."trigdroid.hooks"]
+typescript = "frida-hooks.main:main"
+
+# Hatchling configuration
+
+[tool.hatch.build]
+packages = ["src/trigdroid", "src/TrigDroid_Infrastructure"]
+include = [
+    "src/trigdroid/**/*.py",
+    "src/TrigDroid_Infrastructure/**/*.py",
+    "src/trigdroid/py.typed",
+    "frida-hooks/dist/*.js",
+    "frida-hooks/dist/*.js.map",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src", 
+    "/frida-hooks",
+    "/tests",
+    "/docs",
+    "/README.md",
+    "/LICENSE", 
+    "/CHANGELOG",
+    "/pyproject.toml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trigdroid", "src/TrigDroid_Infrastructure"]
+
+# TypeScript hooks are built separately via npm run build
+
+# Black code formatting
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # Exclude generated files
+  | .*_pb2\.py
+)/
+'''
+
+# isort import sorting
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["trigdroid"]
+#skip_glob = ["src/TrigDroid/*"]
+
+# mypy type checking
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = "frida.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]  
+module = "src.TrigDroid.*"
+ignore_errors = true
+
+# pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "-ra",
+    "--strict-markers", 
+    "--strict-config",
+    "--cov=trigdroid",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "requires_device: marks tests that require an Android device",
+    "requires_frida: marks tests that require Frida",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["trigdroid"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*", 
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Ruff linting (faster alternative to pylint)
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox", 
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["N802", "N803", "N806"]  # Allow non-standard naming in tests
+
+# Legacy pylint configuration (kept for compatibility)
+[tool.pylint.master]
+init-hook = 'import sys; sys.path.append("src")'
+ignore = ["TrigDroid"]  # Ignore legacy directory
+extension-pkg-allow-list = ["frida"]
+
+[tool.pylint.messages_control]
+disable = [
+    "global-statement",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-instance-attributes",
+    "too-many-locals",
+    "too-many-branches",
+    "too-many-statements",
+]
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint.design]
+max-args = 10
+max-attributes = 15
+max-public-methods = 40

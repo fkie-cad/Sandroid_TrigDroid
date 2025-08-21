@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DivById</string>
+    <string name="malicious_behaviour">Malicious Behaviour</string>
+    <string name="app_icon">App Icon</string>
+    <string name="benign_behaviour">Benign Behaviour</string>
+    <string name="trigger_template">Trigger DivById</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
+</resources>

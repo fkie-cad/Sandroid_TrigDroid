@@ -1,0 +1,86 @@
+# Changelog
+
+This is the changelog of the TrigDroid project. For a complete documentation install (`pip install pdoc`) and execute the command you can find in the [development guide](docs/Development.md#create--read-the-documentation).
+
+- [Changelog](#changelog)
+  - [Major Version 2](#major-version-2)
+    - [2.0.0](#200)
+  - [Major Version 1](#major-version-1)
+    - [1.1.1](#111)
+    - [1.1.0](#110)
+    - [1.0.3](#103)
+    - [1.0.2](#102)
+    - [1.0.1](#101)
+    - [1.0.0](#100)
+
+## Major Version 2
+
+### 2.0.0
+
+**Breaking Changes**
+
+- Use --constants instead of --build-constants and --telephony-manager
+  - Some constants are not longer available here, because they are not relevant for emulator detection
+  - Several constants are added, because they are relevant for emulator detection
+- Use --ip-4 instead of --ip-address
+  - The new option as another syntax
+  - The new options gives you more possibilities of changing the ip address
+  - See also the new option --ip-6
+
+**Features**
+
+- add tests
+- add several new relevant constants
+- add pressure and light sensor rotation
+- add manipulation option of several properties
+- add option sensor count
+- add NFC adapter availability option
+- add bluetooth-mac option
+- add --ip-4 and --ip-6 to manipulate ip addresses
+
+**Fixes**
+
+- minor bugs
+
+## Major Version 1
+
+### 1.1.1
+
+**Features**
+
+- Add --hide-apps option. Use this option if --uninstall does not work e.g. because you want to uninstall a system app.
+
+**Fixes**
+
+- critical error while using --uptime.
+
+### 1.1.0
+
+**Features**
+
+- Start TrigDroid on the home screen by giving "no_package" as package argument.
+
+### 1.0.3
+
+**Fixes**
+
+- bug on reading android device architecture on some devices
+
+### 1.0.2
+
+**Fixes**
+
+- bug on reading android device architecture on some devices
+- failed app closing on newer android versions
+
+### 1.0.1
+
+**Fixes**
+
+- add configuration option `no_unroot`
+
+### 1.0.0
+
+**Fixes**
+
+- Building the first pip package.
