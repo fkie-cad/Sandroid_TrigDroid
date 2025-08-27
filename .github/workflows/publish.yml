@@ -1,0 +1,70 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches: [main]
+    # Only run when the version file changes
+    paths: [ "src/trigdroid/_version.py" ]
+  workflow_dispatch: {} # for manual runs
+
+permissions:
+  contents: write    # needed to create a GitHub Release
+  id-token: write    # needed for PyPI Trusted Publishing (OIDC)
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    name: Build & Publish (tagged release)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install build backend
+        run: python -m pip install --upgrade build
+
+      - name: Extract version from src/trigdroid/_version.py
+        id: getver
+        run: |
+          python - <<'PY'
+          import os, re, pathlib
+          m = re.search(r'__version__\s*=\s*[\'"]([^\'"]+)[\'"]',
+                        pathlib.Path('src/trigdroid/_version.py').read_text())
+          if not m:
+            raise SystemExit("Could not find __version__ in src/trigdroid/_version.py")
+          print(f"version={m.group(1)}")
+          open(os.environ["GITHUB_OUTPUT"], "a").write(f"version={m.group(1)}\n")
+          PY
+
+
+      - name: Build sdist & wheel
+        run: python -m build
+
+      - name: Publish to PyPI (Trusted Publishing)
+        # No username/password needed when using Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          verbose: true
+          # skip-existing prevents a hard fail if the same files were uploaded already
+          skip-existing: true
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            dist/*.whl
+            dist/*.tar.gz

@@ -8,8 +8,6 @@ This package provides both a command-line interface and a Python API for
 security researchers, malware analysts, and penetration testers.
 """
 
-__version__ = "2.0.0"
-
 # Export main API components
 from .api.main import TrigDroidAPI
 from .api.config import TestConfiguration

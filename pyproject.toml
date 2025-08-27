@@ -5,7 +5,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "trigdroid"
-version = "2.0.1"
 description = "Android Sandbox Payload Trigger Framework for Security Research"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -138,6 +137,10 @@ sensor = "trigdroid_infrastructure.test_runners.sensor_test_runner:SensorTestRun
 
 [project.entry-points."trigdroid.hooks"]
 frida-typescript = "trigdroid.frida_hooks.main:main"  # descriptive plugin key
+
+
+[tool.setuptools.dynamic]
+version = { attr = "trigdroid._version.__version__" }
 
 # Hatchling configuration
 
