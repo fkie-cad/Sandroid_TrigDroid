@@ -144,8 +144,9 @@ sensor = "trigdroid_infrastructure.test_runners.sensor_test_runner:SensorTestRun
 frida-typescript = "trigdroid.frida_hooks.main:main"  # descriptive plugin key
 
 
-[tool.setuptools.dynamic]
-version = { attr = "trigdroid._version.__version__" }
+# Hatch version configuration 
+[tool.hatch.version]
+path = "src/trigdroid/_version.py"
 
 # Hatchling configuration
 
