@@ -5,16 +5,16 @@ build-backend = "hatchling.build"
 
 [project]
 name = "trigdroid"
-version = "2.0.0"
+version = "2.0.1"
 description = "Android Sandbox Payload Trigger Framework for Security Research"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
     {name = "Daniel Baier", email = "daniel.baier@fkie.fraunhofer.de"},
-    {name = "Simon Hüsch", email = "simon.huesch@smail.inf.h-brs.de"},
+    {name = "Simon Hüsch", email = "simon.huesch@smail.inf.h-brs.de"}
 ]
 maintainers = [
-    {name = "TrigDroid Team", email = "contact@trigdroid.org"},
+    {name = "Daniel Baier", email = "daniel.baier@fkie.fraunhofer.de"}
 ]
 keywords = [
     "android",
@@ -126,18 +126,18 @@ Repository = "https://github.com/fkie-cad/Sandroid_TrigDroid.git"
 "Bug Tracker" = "https://github.com/fkie-cad/Sandroid_TrigDroid/issues"
 Changelog = "https://github.com/fkie-cad/Sandroid_TrigDroid/blob/main/CHANGELOG.md"
 
-# CLI entry points
+# CLI entry points (create console scripts)
 [project.scripts]
-trigdroid = "trigdroid.cli.main:main"
-trigdroid-legacy = "TrigDroid.__main__:main"
+trigdroid = "trigdroid.cli:main"
+trigdroid-legacy = "trigdroid_legacy.cli:main"   # keep legacy CLI separate & lowercased
 
-# Python entry points for programmatic access  
+# Plugin entry points for programmatic discovery
 [project.entry-points."trigdroid.test_runners"]
-frida = "TrigDroid_Infrastructure.test_runners.frida_test_runner:FridaTestRunner"
-sensor = "TrigDroid_Infrastructure.test_runners.sensor_test_runner:SensorTestRunner"
+frida = "trigdroid_infrastructure.test_runners.frida_test_runner:FridaTestRunner"
+sensor = "trigdroid_infrastructure.test_runners.sensor_test_runner:SensorTestRunner"
 
 [project.entry-points."trigdroid.hooks"]
-typescript = "frida-hooks.main:main"
+frida-typescript = "trigdroid.frida_hooks.main:main"  # descriptive plugin key
 
 # Hatchling configuration
 
@@ -147,14 +147,14 @@ include = [
     "src/trigdroid/**/*.py",
     "src/TrigDroid_Infrastructure/**/*.py",
     "src/trigdroid/py.typed",
-    "frida-hooks/dist/*.js",
-    "frida-hooks/dist/*.js.map",
+    "frida_hooks/dist/*.js",
+    "frida_hooks/dist/*.js.map",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/src", 
-    "/frida-hooks",
+    "/frida_hooks",
     "/tests",
     "/docs",
     "/README.md",
