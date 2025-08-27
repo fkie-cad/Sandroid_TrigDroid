@@ -1,0 +1,54 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+version: 2
+
+# Set the version of Python and other tools you want to use
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.9"
+    nodejs: "16"
+  jobs:
+    pre_build:
+      # Install Node.js dependencies for TypeScript hooks
+      - cd frida-hooks && npm install && npm run build
+    post_build:
+      # Clean up build artifacts
+      - rm -rf frida-hooks/node_modules
+
+# Build documentation in the docs/ directory with Sphinx
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: false
+
+# Optionally build your docs in additional formats such as PDF and ePub
+formats:
+  - pdf
+  - epub
+
+# Python dependencies required to build your docs
+python:
+  install:
+    # Install the package itself
+    - method: pip
+      path: .
+      extra_requirements:
+        - dev
+        - docs
+    # Install documentation requirements
+    - requirements: docs/requirements.txt
+  # Set Python version
+  version: "3.9"
+
+# Additional configuration
+search:
+  ranking:
+    docs/api/: 2
+    docs/installation.html: 5
+    docs/background.html: 4
+
+# Submodules configuration (if using git submodules)
+submodules:
+  exclude: all
+  recursive: false

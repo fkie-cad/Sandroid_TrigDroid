@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 [project]
 name = "trigdroid"
 description = "Android Sandbox Payload Trigger Framework for Security Research"
+dynamic = ["version"]
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
@@ -94,10 +95,14 @@ dev = [
 
 # Documentation dependencies
 docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.0.0",
-    "mkdocs-click>=0.8.0",
-    "mkdocstrings[python]>=0.22.0",
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "myst-parser>=2.0.0",
+    "sphinx-autodoc-typehints>=1.24.0",
+    "sphinx-copybutton>=0.5.0",
+    "sphinx-autobuild>=2021.3.14",
+    "markdown-it-py>=3.0.0",
+    "mdit-py-plugins>=0.4.0",
 ]
 
 # Testing dependencies

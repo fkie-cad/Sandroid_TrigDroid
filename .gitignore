@@ -9,6 +9,10 @@ __pycache__/
 # dev and misc stuff
 *.md
 
+# documentation build artifacts
+docs/_build/
+docs/_static/
+
 # Distribution / packaging
 .Python
 build/
