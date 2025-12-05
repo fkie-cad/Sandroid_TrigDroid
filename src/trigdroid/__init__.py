@@ -18,33 +18,47 @@ from .api.quick_start import quick_test, validate_environment, setup_environment
 # Export core types
 from .core.enums import LogLevel, TestPhase, SensorType
 from .exceptions import (
-    TrigDroidError, 
-    DeviceError, 
+    TrigDroidError,
+    DeviceError,
     ConfigurationError,
     TestExecutionError
+)
+
+# Export scripts access
+from .scripts import (
+    get_bypass_script_path,
+    get_main_script_path,
+    get_script_path,
+    list_available_scripts,
 )
 
 __all__ = [
     # Main API
     "TrigDroidAPI",
-    "TestConfiguration", 
+    "TestConfiguration",
     "TestResult",
     "DeviceManager",
     "AndroidDevice",
-    
+
     # Convenience functions
     "quick_test",
-    "validate_environment", 
+    "validate_environment",
     "setup_environment",
-    
+
+    # Scripts access
+    "get_bypass_script_path",
+    "get_main_script_path",
+    "get_script_path",
+    "list_available_scripts",
+
     # Enums
     "LogLevel",
-    "TestPhase", 
+    "TestPhase",
     "SensorType",
-    
+
     # Exceptions
     "TrigDroidError",
     "DeviceError",
-    "ConfigurationError", 
+    "ConfigurationError",
     "TestExecutionError",
 ]

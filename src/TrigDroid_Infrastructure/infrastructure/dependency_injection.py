@@ -134,8 +134,7 @@ def configure_container() -> DIContainer:
     from .android import AndroidDevice
     from .changelog import FileChangelogWriter
     from ..test_runners import (
-        FridaTestRunner, SensorTestRunner, NetworkTestRunner,
-        BatteryTestRunner, ApplicationTestRunner
+        FridaTestRunner, SensorTestRunner
     )
     from .frida import TypeScriptFridaHookProvider
     from ..application import ApplicationOrchestrator

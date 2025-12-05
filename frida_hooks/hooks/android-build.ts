@@ -59,10 +59,11 @@ export class AndroidBuildHooks {
             HookUtils.sendDebug(`Could not create Build instance: ${error}`);
         }
 
+        // Use 'any' for Frida's Java.choose callback - the actual type is a Frida Wrapper
         Java.choose('android.os.Build', {
-            onMatch: (instance: AndroidBuild) => {
+            onMatch: (instance: any) => {
                 HookUtils.sendInfo('Hooked android.os.Build');
-                this.hookBuildInstance(instance);
+                this.hookBuildInstance(instance as AndroidBuild);
             },
             onComplete: () => {
                 HookUtils.sendInfo('Hooked all instances of android.os.Build');

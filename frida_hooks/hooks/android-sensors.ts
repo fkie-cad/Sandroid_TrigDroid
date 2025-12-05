@@ -58,28 +58,31 @@ export class AndroidSensorHooks {
         const originalGetPower = sensorClass.getPower;
         if (!originalGetPower) return;
 
-        sensorClass.getPower.implementation = function(this: AndroidSensor) {
+        // Capture config reference for use in implementation closure
+        const config = this.config;
+
+        sensorClass.getPower.implementation = function(this: any) {
             const original = originalGetPower.call(this);
             const sensorType = this.getType();
-            
+
             let fakeValue: number | undefined;
             let sensorName = 'unknown';
 
             switch (sensorType) {
                 case SENSOR_TYPES.ACCELEROMETER:
-                    fakeValue = this.getAccelerometerPowerValue();
+                    fakeValue = config.accelerometer?.power;
                     sensorName = 'accelerometer';
                     break;
                 case SENSOR_TYPES.LIGHT:
-                    fakeValue = this.getLightPowerValue();
+                    fakeValue = config.light?.power;
                     sensorName = 'light sensor';
                     break;
                 case SENSOR_TYPES.MAGNETIC_FIELD:
-                    fakeValue = this.getMagnetometerPowerValue();
+                    fakeValue = config.magnetometer?.power;
                     sensorName = 'magnetometer';
                     break;
                 case SENSOR_TYPES.PRESSURE:
-                    fakeValue = this.getPressurePowerValue();
+                    fakeValue = config.pressure?.power;
                     sensorName = 'pressure sensor';
                     break;
             }
@@ -100,7 +103,7 @@ export class AndroidSensorHooks {
                 `Hooked getPower() of android.hardware.Sensor and returned original value ${original}, sensorType=${sensorType} not configured`
             );
             return original;
-        }.bind(this);
+        };
     }
 
     /**
@@ -113,20 +116,23 @@ export class AndroidSensorHooks {
         const originalGetMaximumRange = sensorClass.getMaximumRange;
         if (!originalGetMaximumRange) return;
 
-        sensorClass.getMaximumRange.implementation = function(this: AndroidSensor) {
+        // Capture config reference for use in implementation closure
+        const config = this.config;
+
+        sensorClass.getMaximumRange.implementation = function(this: any) {
             const original = originalGetMaximumRange.call(this);
             const sensorType = this.getType();
-            
+
             let fakeValue: number | undefined;
             let sensorName = 'unknown';
 
             switch (sensorType) {
                 case SENSOR_TYPES.ACCELEROMETER:
-                    fakeValue = this.getAccelerometerRangeValue();
+                    fakeValue = config.accelerometer?.range;
                     sensorName = 'accelerometer';
                     break;
                 case SENSOR_TYPES.MAGNETIC_FIELD:
-                    fakeValue = this.getMagnetometerRangeValue();
+                    fakeValue = config.magnetometer?.range;
                     sensorName = 'magnetometer';
                     break;
             }
@@ -147,7 +153,7 @@ export class AndroidSensorHooks {
                 `Hooked getMaximumRange() of android.hardware.Sensor and returned original value ${original}, sensorType=${sensorType} not configured`
             );
             return original;
-        }.bind(this);
+        };
     }
 
     /**
@@ -160,20 +166,23 @@ export class AndroidSensorHooks {
         const originalGetResolution = sensorClass.getResolution;
         if (!originalGetResolution) return;
 
-        sensorClass.getResolution.implementation = function(this: AndroidSensor) {
+        // Capture config reference for use in implementation closure
+        const config = this.config;
+
+        sensorClass.getResolution.implementation = function(this: any) {
             const original = originalGetResolution.call(this);
             const sensorType = this.getType();
-            
+
             let fakeValue: number | undefined;
             let sensorName = 'unknown';
 
             switch (sensorType) {
                 case SENSOR_TYPES.ACCELEROMETER:
-                    fakeValue = this.getAccelerometerResolutionValue();
+                    fakeValue = config.accelerometer?.resolution;
                     sensorName = 'accelerometer';
                     break;
                 case SENSOR_TYPES.PRESSURE:
-                    fakeValue = this.getPressureResolutionValue();
+                    fakeValue = config.pressure?.resolution;
                     sensorName = 'pressure sensor';
                     break;
             }
@@ -194,7 +203,7 @@ export class AndroidSensorHooks {
                 `Hooked getResolution() of android.hardware.Sensor and returned original value ${original}, sensorType=${sensorType} not configured`
             );
             return original;
-        }.bind(this);
+        };
     }
 
     /**

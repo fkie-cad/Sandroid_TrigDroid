@@ -154,10 +154,10 @@ path = "src/trigdroid/_version.py"
 packages = ["src/trigdroid", "src/TrigDroid_Infrastructure"]
 include = [
     "src/trigdroid/**/*.py",
+    "src/trigdroid/scripts/*.js",
+    "src/trigdroid/scripts/hooks/*.js",
     "src/TrigDroid_Infrastructure/**/*.py",
     "src/trigdroid/py.typed",
-    "frida_hooks/dist/*.js",
-    "frida_hooks/dist/*.js.map",
 ]
 
 [tool.hatch.build.targets.sdist]

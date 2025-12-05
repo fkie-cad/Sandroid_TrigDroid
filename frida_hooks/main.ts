@@ -7,6 +7,13 @@ import { AndroidSensorHooks } from './hooks/android-sensors';
 import { AndroidBuildHooks } from './hooks/android-build';
 import { HookUtils } from './utils';
 
+// Bypass hook imports
+import { SSLUnpinningHooks, SSLUnpinningConfig } from './hooks/ssl-unpinning';
+import { RootDetectionHooks, RootDetectionConfig } from './hooks/root-detection';
+import { EmulatorDetectionHooks, EmulatorDetectionConfig } from './hooks/emulator-detection';
+import { FridaDetectionHooks, FridaDetectionConfig } from './hooks/frida-detection';
+import { DebugDetectionHooks, DebugDetectionConfig } from './hooks/debug-detection';
+
 /**
  * Main hook configuration interface.
  * This will be populated by the Python configuration system.
@@ -126,6 +133,16 @@ interface TrigDroidHookConfig {
         voice_mail_number?: string;
         data_network_type?: number;
     };
+
+    // Security bypass configuration
+    // For authorized security testing and research purposes only
+    bypass?: {
+        ssl_unpinning?: SSLUnpinningConfig;
+        root_detection?: RootDetectionConfig;
+        emulator_detection?: EmulatorDetectionConfig;
+        frida_detection?: FridaDetectionConfig;
+        debug_detection?: DebugDetectionConfig;
+    };
 }
 
 /**
@@ -148,8 +165,47 @@ function initializeHooks(config: TrigDroidHookConfig): void {
             buildHooks.initialize();
         }
 
-        // Initialize other hooks as needed
-        // TODO: Add more hook modules here
+        // Initialize security bypass hooks
+        // These are for authorized security testing and research purposes only
+        if (config.bypass) {
+            const bypassConfig = config.bypass;
+
+            // SSL/TLS Unpinning - bypass certificate pinning
+            if (bypassConfig.ssl_unpinning?.enabled) {
+                HookUtils.sendInfo('Loading SSL unpinning bypass hooks...');
+                const sslHooks = new SSLUnpinningHooks(bypassConfig.ssl_unpinning);
+                sslHooks.initialize();
+            }
+
+            // Root Detection Bypass - hide root indicators
+            if (bypassConfig.root_detection?.enabled) {
+                HookUtils.sendInfo('Loading root detection bypass hooks...');
+                const rootHooks = new RootDetectionHooks(bypassConfig.root_detection);
+                rootHooks.initialize();
+            }
+
+            // Emulator Detection Bypass - spoof device properties
+            if (bypassConfig.emulator_detection?.enabled) {
+                HookUtils.sendInfo('Loading emulator detection bypass hooks...');
+                const emulatorHooks = new EmulatorDetectionHooks(bypassConfig.emulator_detection);
+                emulatorHooks.initialize();
+            }
+
+            // Frida Detection Bypass - hide Frida presence
+            // Note: Most effective in SPAWN mode as detection often occurs at startup
+            if (bypassConfig.frida_detection?.enabled) {
+                HookUtils.sendInfo('Loading Frida detection bypass hooks...');
+                const fridaHooks = new FridaDetectionHooks(bypassConfig.frida_detection);
+                fridaHooks.initialize();
+            }
+
+            // Debug Detection Bypass - hide debugger presence
+            if (bypassConfig.debug_detection?.enabled) {
+                HookUtils.sendInfo('Loading debug detection bypass hooks...');
+                const debugHooks = new DebugDetectionHooks(bypassConfig.debug_detection);
+                debugHooks.initialize();
+            }
+        }
 
         HookUtils.sendInfo('TrigDroid Frida hooks initialized successfully');
     } catch (error) {

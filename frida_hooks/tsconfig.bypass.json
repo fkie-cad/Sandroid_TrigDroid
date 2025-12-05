@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "declaration": false,
+    "sourceMap": false,
+    "removeComments": true,
+    "noEmitOnError": false,
+    "lib": ["ES2017"]
+  },
+  "include": [
+    "trigdroid_bypass_rpc.ts",
+    "utils.ts",
+    "types.ts",
+    "hooks/ssl-unpinning.ts",
+    "hooks/root-detection.ts",
+    "hooks/frida-detection.ts",
+    "hooks/emulator-detection.ts",
+    "hooks/debug-detection.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "hooks/android-build.ts",
+    "hooks/android-sensors.ts",
+    "main.ts"
+  ]
+}

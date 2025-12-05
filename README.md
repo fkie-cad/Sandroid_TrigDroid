@@ -1,4 +1,4 @@
-# TrigDroid 🤖
+# TrigDroid
 
 **Android Sandbox Payload Trigger Framework for Security Research**
 
@@ -9,19 +9,19 @@
 
 TrigDroid is a modern Android security testing framework designed to trigger payloads in potentially malicious Android applications through sophisticated environmental manipulation. Built for security researchers, malware analysts, and penetration testers, it provides both a powerful command-line interface and a flexible Python API. It is part of the Android Sandbox Sandroid.
 
-## 🎯 Key Features
+## Key Features
 
-- **🔍 Payload Trigger Detection**: Sophisticated environmental manipulation to trigger hidden malicious behaviors
-- **📱 Multi-Device Support**: Works with physical devices and emulators
-- **🔧 Dual Interface**: Both CLI and Python API for maximum flexibility  
-- **⚡ Frida Integration**: Advanced runtime instrumentation with TypeScript hooks
-- **🌐 Network Manipulation**: WiFi, mobile data, and Bluetooth state changes
-- **📊 Sensor Simulation**: Accelerometer, gyroscope, light, pressure, and more
-- **🔋 Battery Simulation**: Dynamic battery level and charging state changes
-- **📈 Comprehensive Reporting**: Detailed test results with timing and metrics
-- **🏗️ Modern Architecture**: Built with SOLID principles and type safety
+- **Payload Trigger Detection**: Sophisticated environmental manipulation to trigger hidden malicious behaviors
+- **Multi-Device Support**: Works with physical devices and emulators
+- **Dual Interface**: Both CLI and Python API for maximum flexibility  
+- **Frida Integration**: Advanced runtime instrumentation with TypeScript hooks
+- **Network Manipulation**: WiFi, mobile data, and Bluetooth state changes
+- **Sensor Simulation**: Accelerometer, gyroscope, light, pressure, and more
+- **Battery Simulation**: Dynamic battery level and charging state changes
+- **Comprehensive Reporting**: Detailed test results with timing and metrics
+- **Modern Architecture**: Built with SOLID principles and type safety
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -60,7 +60,7 @@ trigdroid devices
 trigdroid info com.example.app
 ```
 
-## 📋 Command Line Interface
+## Command Line Interface
 
 ### Core Commands
 
@@ -119,7 +119,7 @@ timeout: 300
 verbose: true
 ```
 
-## 🐍 Python API
+## Python API
 
 ### Simple Usage
 
@@ -155,23 +155,23 @@ with TrigDroidAPI() as trigdroid:
     
     # Analyze results
     if result.success:
-        print(f"✅ Test completed in {result.duration_seconds:.1f}s")
-        print(f"📊 Tests run: {result.total_tests}")
-        print(f"✅ Passed: {result.passed_tests}")
-        print(f"❌ Failed: {result.failed_tests}")
+        print(f"Test completed in {result.duration_seconds:.1f}s")
+        print(f"Tests run: {result.total_tests}")
+        print(f"Passed: {result.passed_tests}")
+        print(f"Failed: {result.failed_tests}")
     else:
-        print(f"❌ Test failed: {result.error}")
+        print(f"Test failed: {result.error}")
         
     # Check for suspicious behavior
     if result.app_crashed:
-        print("⚠️  App crashed during testing")
+        print("App crashed during testing")
     if result.frida_errors:
-        print(f"🔍 Frida instrumentation issues: {result.frida_errors}")
+        print(f"Frida instrumentation issues: {result.frida_errors}")
     
     # Access detailed metrics
-    print(f"📱 Sensor tests: {len(result.sensor_tests_executed)}")
-    print(f"🌐 Network changes: {len(result.network_state_changes)}")
-    print(f"🔋 Background time: {result.app_background_time:.1f}s")
+    print(f"Sensor tests: {len(result.sensor_tests_executed)}")
+    print(f"Network changes: {len(result.network_state_changes)}")
+    print(f"Background time: {result.app_background_time:.1f}s")
 ```
 
 ### Device Management API
@@ -203,19 +203,19 @@ from trigdroid.api.quick_start import validate_environment, setup_environment
 # Check if environment is ready
 status = validate_environment()
 if all(status.values()):
-    print("🎉 Environment is ready!")
+    print("Environment is ready!")
 else:
-    print("❌ Issues found:")
+    print("Issues found:")
     for check, result in status.items():
         if not result:
             print(f"  • {check}")
 
 # Automatically setup environment
 if setup_environment():
-    print("✅ Environment setup complete")
+    print("Environment setup complete")
 ```
 
-## 🔧 Advanced Features
+## Advanced Features
 
 ### Sensor Manipulation
 
@@ -255,6 +255,77 @@ TrigDroid includes sophisticated Frida hooks written in TypeScript:
 - **Behavior monitoring**: Track app interactions with system APIs
 - **Anti-analysis detection**: Identify evasion techniques
 
+### Scripts API (Programmatic Access to Frida Hooks)
+
+TrigDroid provides a Python API for accessing compiled Frida scripts:
+
+```python
+from trigdroid.scripts import (
+    get_bypass_script_path,    # Get bypass script path
+    get_main_script_path,      # Get main script path
+    get_hook_script_path,      # Get individual hook script path
+    list_available_scripts,    # List all available scripts
+    list_available_hooks,      # List available hook names
+    read_script,               # Read script contents as string
+)
+
+# Get the bypass script for objection integration
+bypass_path = get_bypass_script_path()
+subprocess.run(["objection", "-g", package, "-s", bypass_path, "explore"])
+
+# Get individual hooks
+ssl_hook = get_hook_script_path("ssl-unpinning")
+root_hook = get_hook_script_path("root-detection")
+
+# List available hooks
+hooks = list_available_hooks()
+# ['ssl-unpinning', 'root-detection', 'frida-detection',
+#  'emulator-detection', 'debug-detection', 'android-build', 'android-sensors']
+
+# Load script with Frida
+from trigdroid.scripts import read_script
+script_source = read_script("trigdroid_bypass_bundle.js")
+script = session.create_script(script_source)
+```
+
+### Bypass Script RPC API
+
+The bypass script provides runtime-controllable bypass functionality:
+
+```python
+import frida
+from trigdroid.scripts import get_bypass_script_path
+
+# Load bypass script
+session = frida.attach(pid)
+with open(get_bypass_script_path()) as f:
+    script = session.create_script(f.read())
+script.load()
+
+# Enable individual bypasses
+script.exports_sync.enableSSLUnpinning()
+script.exports_sync.enableRootBypass()
+script.exports_sync.enableFridaBypass()
+script.exports_sync.enableEmulatorBypass({'device_profile': 'pixel_6_pro'})
+script.exports_sync.enableDebugBypass()
+
+# Or batch enable multiple bypasses
+script.exports_sync.enableBypasses({
+    'ssl': True,
+    'root': True,
+    'emulator': {'device_profile': 'samsung_s21'}
+})
+
+# Check bypass status
+status = script.exports_sync.getStatus()
+print(f"SSL unpinning: {status['ssl_unpinning']}")
+print(f"Root bypass: {status['root_detection']}")
+
+# Get available device profiles for emulator bypass
+profiles = script.exports_sync.getDeviceProfiles()
+# ['pixel_4_xl', 'pixel_6_pro', 'samsung_s21', 'oneplus_9', 'generic']
+```
+
 ### Battery and System Simulation
 
 ```bash
@@ -265,7 +336,7 @@ trigdroid -p com.example.app \
   --min-runtime 5            # Minimum 5 minutes runtime
 ```
 
-## 📊 Understanding Results
+## Understanding Results
 
 ### Test Result Structure
 
@@ -302,20 +373,20 @@ summary = result.summary()  # Human-readable summary
 
 ### Interpreting Security Findings
 
-**🔍 Suspicious Indicators:**
+**Suspicious Indicators:**
 - App crashes during sensor manipulation
 - Unexpected network activity during state changes
 - Frida hook detection or evasion attempts
 - Unusual battery usage patterns
 - Background behavior changes
 
-**✅ Normal Behavior:**
+**Normal Behavior:**
 - Consistent app performance across all tests
 - No crashes or errors
 - Predictable sensor responses
 - Standard network usage patterns
 
-## 🛠️ Development and Integration
+## Development and Integration
 
 ### Third-Party Project Integration
 
@@ -349,7 +420,7 @@ def analyze_apk(package_name: str) -> dict:
 # Usage
 analysis = analyze_apk("com.suspicious.app")
 if analysis["malicious"]:
-    print(f"⚠️  Malicious behavior detected (confidence: {analysis['confidence']:.1f}%)")
+    print(f"WARNING: Malicious behavior detected (confidence: {analysis['confidence']:.1f}%)")
 ```
 
 ### CI/CD Integration
@@ -391,26 +462,8 @@ jobs:
           --frida
 ```
 
-## 🔒 Security Considerations
 
-**⚠️ Important**: TrigDroid is designed for **defensive security research** and **malware analysis** only.
-
-### Ethical Usage Guidelines
-
-- ✅ **Authorized Testing**: Only test applications you own or have explicit permission to analyze
-- ✅ **Research Purposes**: Use for academic research, security analysis, and malware detection
-- ✅ **Controlled Environment**: Run tests in isolated environments or sandboxes
-- ❌ **No Malicious Use**: Do not use to enhance or create malicious capabilities
-- ❌ **No Unauthorized Testing**: Do not test third-party applications without permission
-
-### Privacy and Legal Compliance
-
-- Ensure compliance with local laws and regulations
-- Respect application privacy policies and terms of service
-- Use appropriate data handling and retention practices
-- Consider ethical implications of security research
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -464,9 +517,8 @@ trigdroid -p com.example.app --grant-permission android.permission.CAMERA
 - **Issues**: Report bugs at [GitHub Issues](https://github.com/trigdroid/trigdroid/issues)
 - **Discussions**: Join the community at [GitHub Discussions](https://github.com/trigdroid/trigdroid/discussions)
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions from the security research community!
 
 ```bash
 # Development setup
@@ -485,18 +537,18 @@ ruff check src/ tests/
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
-## 📄 License
+## License
 
 TrigDroid is released under the [MIT License](LICENSE). See LICENSE file for details.
 
-## 🛠️ Development Guide
+## Development Guide
 
 ### Modern Architecture Overview
 
 TrigDroid has been completely refactored following **SOLID principles** with a clean dual-layer architecture:
 
 ```
-├── src/                   # 🆕 New Refactored Code (SOLID Architecture)
+├── src/                   # New Refactored Code (SOLID Architecture)
 │   ├── trigdroid/          # Modern Public API Layer (lowercase)
 │   │   ├── api/            # External interface with context managers
 │   │   │   ├── main.py     # TrigDroidAPI class
@@ -511,7 +563,7 @@ TrigDroid has been completely refactored following **SOLID principles** with a c
 │   │   │   ├── enums.py    # Type-safe enumerations
 │   │   │   └── cleanup.py  # Resource management
 │   │   └── exceptions.py   # Exception hierarchy
-│   └── TrigDroid_Infrastructure/  # 🏗️ Infrastructure Layer (SOLID)
+│   └── TrigDroid_Infrastructure/  # Infrastructure Layer (SOLID)
 │       ├── interfaces/     # Protocol-based abstractions
 │       │   └── __init__.py # ILogger, ITestRunner, IAndroidDevice, etc.
 │       ├── infrastructure/ # Dependency injection + implementations
@@ -522,14 +574,14 @@ TrigDroid has been completely refactored following **SOLID principles** with a c
 │       ├── application/    # Application orchestration
 │       │   └── orchestrator.py # Main workflow coordinator
 │       └── test_runners/   # Test execution implementations
-├── src/                    # 🏛️ Legacy Code (Original Implementation)
+├── src/                    # Legacy Code (Original Implementation)
 │   └── TrigDroid/          # Legacy TrigDroid (preserved for compatibility)
 │       ├── logger/         # Original logging utilities
 │       ├── interaction/    # Legacy UI components  
 │       ├── utils/          # Legacy utility functions
 │       ├── frida/          # Legacy JavaScript hooks
 │       └── ...             # Other legacy components
-├── frida-hooks/            # 🔧 TypeScript Frida Hooks (New)
+├── frida-hooks/            # TypeScript Frida Hooks (New)
 │   ├── main.ts            # Hook entry point
 │   ├── hooks/             # Individual hook modules
 │   │   ├── android-sensors.ts
@@ -538,7 +590,7 @@ TrigDroid has been completely refactored following **SOLID principles** with a c
 │   ├── utils.ts           # Common hook utilities
 │   ├── package.json       # Node.js build configuration
 │   └── tsconfig.json      # TypeScript compiler settings
-├── scripts/               # 🚀 Build and installation scripts
+├── scripts/               # Build and installation scripts
 │   ├── build.py          # Cross-platform build script
 │   └── install.sh        # Automated installation
 ├── pyproject.toml        # Modern Python packaging (PEP 621)
@@ -727,21 +779,73 @@ function main() {
 }
 ```
 
+### Building Frida Hooks from Source
+
+If you want to modify the Frida hooks, you'll need to rebuild them:
+
+#### **Prerequisites**
+```bash
+# Node.js >= 16.0.0
+node --version
+
+# Install frida-compile (required for bundling)
+pip install frida-tools
+```
+
+#### **Build Commands**
+```bash
+cd frida_hooks
+
+# Install dependencies
+npm install
+
+# Build everything (recommended)
+npm run build:all
+
+# Or build individually:
+npm run build          # Main hooks only
+npm run build:bypass   # Bypass script only
+
+# Development mode
+npm run watch          # Watch for changes (TypeScript only)
+
+# Clean rebuild
+npm run rebuild        # Clean + build:all
+```
+
+#### **Build Output**
+After building, scripts are automatically copied to `src/trigdroid/scripts/`:
+```
+src/trigdroid/scripts/
+├── main_bundle.js               # Bundled main script (self-contained)
+├── main.js                      # Unbundled main script
+├── trigdroid_bypass_bundle.js   # Bundled bypass script (self-contained)
+├── trigdroid_bypass_rpc.js      # Unbundled bypass script
+├── types.js, utils.js           # Utilities
+└── hooks/                       # Individual hook scripts
+    ├── ssl-unpinning.js
+    ├── root-detection.js
+    ├── frida-detection.js
+    ├── emulator-detection.js
+    ├── debug-detection.js
+    ├── android-build.js
+    └── android-sensors.js
+```
+
+See [frida_hooks/README.md](frida_hooks/README.md) for detailed development documentation.
+
 ### TypeScript Hook Development
 
-#### **Building Hooks**
+#### **Adding Custom Hooks**
 ```bash
 # Build hooks automatically during pip install
 pip install -e .
 
 # Manual hook building
-cd frida-hooks
+cd frida_hooks
 npm install      # Install dependencies
 npm run build    # Compile TypeScript to JavaScript
 npm run watch    # Watch mode for development
-
-# Using make
-make hooks       # Build hooks only
 ```
 
 #### **Hook Development Patterns**
@@ -1032,15 +1136,9 @@ print(f"Registered services: {list(container._services.keys())}")
 
 This development guide provides comprehensive information for contributing to and extending TrigDroid's modern architecture.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built on the foundation of the [Evadroid](https://github.com/evadroid/evadroid) project
 - Powered by [Frida](https://frida.re/) dynamic instrumentation toolkit
 - Uses [Click](https://click.palletsprojects.com/) for command-line interface
 - Enhanced with [Rich](https://rich.readthedocs.io/) for beautiful terminal output
-
----
-
-**Made with ❤️ for the security research community**
-
-*TrigDroid helps security researchers and malware analysts understand and detect sophisticated Android threats through intelligent payload triggering and environmental manipulation.*

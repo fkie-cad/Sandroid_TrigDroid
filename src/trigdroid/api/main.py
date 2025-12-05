@@ -10,10 +10,10 @@ from .devices import AndroidDevice, DeviceManager
 from ..exceptions import TrigDroidError, DeviceError, ConfigurationError
 from ..core.enums import LogLevel, TestPhase
 
-# Import the refactored core components
-from ...TrigDroid_Infrastructure.infrastructure.dependency_injection import configure_container, ServiceLocator
-from ...TrigDroid_Infrastructure.infrastructure.logging import LoggerFactory
-from ...TrigDroid_Infrastructure.application.orchestrator import ApplicationOrchestrator
+# Import the refactored core components (absolute imports for sibling package)
+from TrigDroid_Infrastructure.infrastructure.dependency_injection import configure_container, ServiceLocator
+from TrigDroid_Infrastructure.infrastructure.logging import LoggerFactory
+from TrigDroid_Infrastructure.application.orchestrator import ApplicationOrchestrator
 
 
 class TrigDroidAPI:
