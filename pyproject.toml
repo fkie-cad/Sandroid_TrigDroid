@@ -152,6 +152,7 @@ path = "src/trigdroid/_version.py"
 
 [tool.hatch.build]
 packages = ["src/trigdroid", "src/TrigDroid_Infrastructure"]
+sources = ["src"]
 include = [
     "src/trigdroid/**/*.py",
     "src/trigdroid/scripts/*.js",
@@ -174,6 +175,7 @@ include = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/trigdroid", "src/TrigDroid_Infrastructure"]
+sources = ["src"]
 
 # TypeScript hooks are built separately via npm run build
 
