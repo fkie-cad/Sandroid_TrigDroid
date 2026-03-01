@@ -48,6 +48,27 @@ def get_scripts_directory() -> Path:
     return Path(__file__).parent
 
 
+def _resolve_script_path(relative_path: str) -> Optional[str]:
+    """Resolve a script path, checking the package directory then the dev fallback.
+
+    Args:
+        relative_path: Path relative to the scripts/dist root (e.g. "main_bundle.js"
+                       or "hooks/ssl-unpinning.js").
+
+    Returns:
+        Absolute path to the script if found, or None.
+    """
+    script_path = get_scripts_directory() / relative_path
+    if script_path.exists():
+        return str(script_path.resolve())
+
+    dev_path = Path(__file__).parent.parent.parent.parent / "frida_hooks" / "dist" / relative_path
+    if dev_path.exists():
+        return str(dev_path.resolve())
+
+    return None
+
+
 def get_bypass_script_path() -> Optional[str]:
     """Get the path to the TrigDroid bypass script.
 
@@ -73,18 +94,7 @@ def get_bypass_script_path() -> Optional[str]:
         >>> with open(path) as f:
         ...     script = session.create_script(f.read())
     """
-    scripts_dir = get_scripts_directory()
-    script_path = scripts_dir / BYPASS_SCRIPT
-
-    if script_path.exists():
-        return str(script_path.resolve())
-
-    # Fallback: check development location
-    dev_path = Path(__file__).parent.parent.parent.parent / "frida_hooks" / "dist" / BYPASS_SCRIPT
-    if dev_path.exists():
-        return str(dev_path.resolve())
-
-    return None
+    return _resolve_script_path(BYPASS_SCRIPT)
 
 
 def get_main_script_path(bundled: bool = True) -> Optional[str]:
@@ -100,19 +110,8 @@ def get_main_script_path(bundled: bool = True) -> Optional[str]:
     Returns:
         Absolute path to the main script, or None if not found.
     """
-    scripts_dir = get_scripts_directory()
     script_name = MAIN_SCRIPT if bundled else MAIN_SCRIPT_UNBUNDLED
-    script_path = scripts_dir / script_name
-
-    if script_path.exists():
-        return str(script_path.resolve())
-
-    # Fallback: check development location
-    dev_path = Path(__file__).parent.parent.parent.parent / "frida_hooks" / "dist" / script_name
-    if dev_path.exists():
-        return str(dev_path.resolve())
-
-    return None
+    return _resolve_script_path(script_name)
 
 
 def get_hooks_directory() -> Path:
@@ -151,18 +150,7 @@ def get_hook_script_path(hook_name: str) -> Optional[str]:
         return None
 
     script_filename = HOOK_SCRIPTS[hook_name]
-    hooks_dir = get_hooks_directory()
-    script_path = hooks_dir / script_filename
-
-    if script_path.exists():
-        return str(script_path.resolve())
-
-    # Fallback: check development location
-    dev_path = Path(__file__).parent.parent.parent.parent / "frida_hooks" / "dist" / "hooks" / script_filename
-    if dev_path.exists():
-        return str(dev_path.resolve())
-
-    return None
+    return _resolve_script_path(f"hooks/{script_filename}")
 
 
 def list_available_hooks() -> list[str]:
@@ -183,18 +171,7 @@ def get_script_path(script_name: str) -> Optional[str]:
     Returns:
         Absolute path to the script, or None if not found.
     """
-    scripts_dir = get_scripts_directory()
-    script_path = scripts_dir / script_name
-
-    if script_path.exists():
-        return str(script_path.resolve())
-
-    # Fallback: check development location
-    dev_path = Path(__file__).parent.parent.parent.parent / "frida_hooks" / "dist" / script_name
-    if dev_path.exists():
-        return str(dev_path.resolve())
-
-    return None
+    return _resolve_script_path(script_name)
 
 
 def list_available_scripts(include_hooks: bool = True) -> list[str]:

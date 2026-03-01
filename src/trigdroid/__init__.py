@@ -14,6 +14,7 @@ from .api.config import TestConfiguration
 from .api.results import TestResult
 from .api.devices import DeviceManager, AndroidDevice
 from .api.quick_start import quick_test, validate_environment, setup_environment
+from .api.trigger_executor import TriggerExecutor, TriggerResult
 
 # Export core types
 from .core.enums import LogLevel, TestPhase, SensorType
@@ -55,6 +56,10 @@ __all__ = [
     "LogLevel",
     "TestPhase",
     "SensorType",
+
+    # Trigger Executor
+    "TriggerExecutor",
+    "TriggerResult",
 
     # Exceptions
     "TrigDroidError",

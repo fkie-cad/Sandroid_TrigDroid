@@ -17,13 +17,16 @@ class FridaTestRunner(TestRunnerBase):
     """Test runner for Frida-based instrumentation."""
     
     SUPPORTED_TESTS = [
+        "frida",
+        "hook",
+        "instrumentation",
         "frida_hooks",
-        "runtime_instrumentation", 
+        "runtime_instrumentation",
         "api_hooking",
         "environment_spoofing"
     ]
     
-    def __init__(self, logger: ILogger, hook_provider: IFridaHookProvider):
+    def __init__(self, logger: ILogger, hook_provider: Optional[IFridaHookProvider] = None):
         super().__init__(logger)
         self._hook_provider = hook_provider
         self._frida_server_process: Optional[subprocess.Popen] = None
@@ -192,6 +195,19 @@ class FridaTestRunner(TestRunnerBase):
         ]
         
         return any(context.config.has_key(option) and context.config.get_value(option) for option in frida_options)
+
+    def _load_hook_script(self, hook_type: str) -> str:
+        """Load a Frida hook script by type."""
+        default_script = 'Java.perform(function() { console.log("[TrigDroid] Hook loaded: ' + hook_type + '"); });'
+        return default_script
+
+    def _get_target_package(self, context: ITestContext) -> str:
+        """Extract target package name from context."""
+        return context.package_name
+
+    def _wait_for_hooks(self, seconds: int) -> None:
+        """Wait for hooks to be loaded."""
+        time.sleep(seconds)
 
 
 class FridaServerManager:

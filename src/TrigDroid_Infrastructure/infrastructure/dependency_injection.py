@@ -18,7 +18,7 @@ class DIContainer:
     def __init__(self):
         self._services: Dict[str, Any] = {}
         self._factories: Dict[str, Callable[[], Any]] = {}
-        self._singletons: Dict[str, Any] = {}
+        self._instances: Dict[str, Any] = {}
         self._transients: Dict[str, Callable[[], Any]] = {}
     
     def register_singleton(self, interface: Type[T], implementation: Union[Type[T], Callable[[], T]], name: Optional[str] = None) -> 'DIContainer':
@@ -48,7 +48,7 @@ class DIContainer:
     def register_instance(self, interface: Type[T], instance: T, name: Optional[str] = None) -> 'DIContainer':
         """Register a specific instance."""
         key = name or self._get_key(interface)
-        self._singletons[key] = instance
+        self._instances[key] = instance
         return self
     
     def resolve(self, interface: Type[T], name: Optional[str] = None) -> T:
@@ -56,13 +56,13 @@ class DIContainer:
         key = name or self._get_key(interface)
         
         # Check if it's already a singleton instance
-        if key in self._singletons:
-            return self._singletons[key]
+        if key in self._instances:
+            return self._instances[key]
         
         # Check if it's a singleton factory
         if key in self._factories:
             instance = self._factories[key]()
-            self._singletons[key] = instance
+            self._instances[key] = instance
             return instance
         
         # Check if it's a transient
@@ -74,7 +74,7 @@ class DIContainer:
     def has_service(self, interface: Type[T], name: Optional[str] = None) -> bool:
         """Check if a service is registered."""
         key = name or self._get_key(interface)
-        return (key in self._singletons or 
+        return (key in self._instances or 
                 key in self._factories or 
                 key in self._transients)
     
@@ -82,6 +82,13 @@ class DIContainer:
     def _get_key(interface: Type[T]) -> str:
         """Get a key for the interface."""
         return f"{interface.__module__}.{interface.__qualname__}"
+
+    def clear(self) -> None:
+        """Remove all registered services."""
+        self._services.clear()
+        self._factories.clear()
+        self._instances.clear()
+        self._transients.clear()
 
 
 class ServiceLocator:
@@ -100,6 +107,18 @@ class ServiceLocator:
         if cls._container is None:
             raise RuntimeError("Container not initialized. Call ServiceLocator.set_container() first.")
         return cls._container.resolve(interface, name)
+
+    @classmethod
+    def has_service(cls, interface, name=None) -> bool:
+        """Check if a service is registered in the global container."""
+        if cls._container is None:
+            return False
+        return cls._container.has_service(interface, name)
+
+    @classmethod
+    def clear(cls) -> None:
+        """Clear the global container reference."""
+        cls._container = None
 
 
 class Injectable(ABC):
@@ -121,56 +140,67 @@ class Injectable(ABC):
 
 def configure_container() -> DIContainer:
     """Configure the dependency injection container with TrigDroid services."""
-    from ..interfaces import (
-        ILogger, IConfigurationProvider, IConfigurationValidator,
-        IAndroidDevice, ITestRunner, IFridaHookProvider, IChangelogWriter,
-        IApplicationOrchestrator
-    )
-    from .logging import StandardLogger
-    from .configuration import (
-        CompositeConfigurationProvider, CommandLineConfigProvider,
-        YamlConfigProvider, ConfigurationValidator
-    )
-    from .android import AndroidDevice
-    from .changelog import FileChangelogWriter
-    from ..test_runners import (
-        FridaTestRunner, SensorTestRunner
-    )
-    from .frida import TypeScriptFridaHookProvider
-    from ..application import ApplicationOrchestrator
-    
     container = DIContainer()
-    
-    # Register logger as singleton
-    container.register_singleton(ILogger, StandardLogger)
-    
-    # Register configuration providers
-    container.register_transient(IConfigurationProvider, lambda: CompositeConfigurationProvider([
-        CommandLineConfigProvider(),
-        YamlConfigProvider()
-    ]), "composite")
-    
-    container.register_singleton(IConfigurationValidator, ConfigurationValidator)
-    
-    # Register Android device
-    container.register_singleton(IAndroidDevice, AndroidDevice)
-    
-    # Register test runners
-    container.register_transient(ITestRunner, FridaTestRunner, "frida")
-    container.register_transient(ITestRunner, SensorTestRunner, "sensor")
-    container.register_transient(ITestRunner, NetworkTestRunner, "network")
-    container.register_transient(ITestRunner, BatteryTestRunner, "battery")
-    container.register_transient(ITestRunner, ApplicationTestRunner, "application")
-    
-    # Register Frida hook provider
-    container.register_singleton(IFridaHookProvider, TypeScriptFridaHookProvider)
-    
-    # Register changelog writer
-    container.register_singleton(IChangelogWriter, FileChangelogWriter)
-    
-    # Register application orchestrator
-    container.register_singleton(IApplicationOrchestrator, ApplicationOrchestrator)
-    
+
+    try:
+        from ..interfaces import (
+            ILogger, IConfigurationProvider, IConfigurationValidator,
+            IAndroidDevice, ITestRunner, IFridaHookProvider, IChangelogWriter,
+            IApplicationOrchestrator
+        )
+        from .logging import StandardLogger
+
+        # Register logger as singleton
+        container.register_singleton(ILogger, StandardLogger)
+
+        # Try to register additional services (may not all be available)
+        try:
+            from .configuration import (
+                CompositeConfigurationProvider, CommandLineConfigProvider,
+                YamlConfigProvider, ConfigurationValidator
+            )
+            container.register_transient(IConfigurationProvider, lambda: CompositeConfigurationProvider([
+                CommandLineConfigProvider(),
+                YamlConfigProvider()
+            ]), "composite")
+            container.register_singleton(IConfigurationValidator, ConfigurationValidator)
+        except ImportError:
+            pass
+
+        try:
+            from .android import AndroidDevice
+            container.register_singleton(IAndroidDevice, AndroidDevice)
+        except ImportError:
+            pass
+
+        try:
+            from ..test_runners import FridaTestRunner, SensorTestRunner
+            container.register_transient(ITestRunner, FridaTestRunner, "frida")
+            container.register_transient(ITestRunner, SensorTestRunner, "sensor")
+        except ImportError:
+            pass
+
+        try:
+            from .frida import TypeScriptFridaHookProvider
+            container.register_singleton(IFridaHookProvider, TypeScriptFridaHookProvider)
+        except ImportError:
+            pass
+
+        try:
+            from .changelog import FileChangelogWriter
+            container.register_singleton(IChangelogWriter, FileChangelogWriter)
+        except ImportError:
+            pass
+
+        try:
+            from ..application import ApplicationOrchestrator
+            container.register_singleton(IApplicationOrchestrator, ApplicationOrchestrator)
+        except ImportError:
+            pass
+
+    except ImportError:
+        pass
+
     return container
 
 

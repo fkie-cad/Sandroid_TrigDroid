@@ -159,30 +159,29 @@ class TestSensorTestRunner:
         assert runner.can_run("network") is False
         assert runner.can_run("unknown") is False
     
-    @patch('TrigDroid_Infrastructure.test_runners.sensor_test_runner.SensorTestRunner._simulate_sensor_changes')
-    def test_execute_internal_should_simulate_sensor_changes(self, mock_simulate, mock_logger, mock_test_context):
-        """Test _execute_internal calls sensor simulation methods."""
+    @patch.object(SensorTestRunner, '_should_run_sensor_rotation', return_value=False)
+    @patch.object(SensorTestRunner, '_set_initial_sensor_values', return_value=True)
+    def test_execute_internal_should_set_initial_sensor_values(self, mock_set_initial, mock_should_rotate, mock_logger, mock_test_context):
+        """Test _execute_internal sets initial sensor values."""
         # Arrange
         runner = SensorTestRunner(mock_logger)
-        mock_simulate.return_value = True
-        
+
         # Act
         result = runner._execute_internal(mock_test_context)
-        
+
         # Assert
         assert result == TestResult.SUCCESS
-        mock_simulate.assert_called_once_with(mock_test_context)
-    
-    @patch('TrigDroid_Infrastructure.test_runners.sensor_test_runner.SensorTestRunner._simulate_sensor_changes')
-    def test_execute_internal_should_return_failure_when_simulation_fails(self, mock_simulate, mock_logger, mock_test_context):
-        """Test _execute_internal returns failure when sensor simulation fails."""
+        mock_set_initial.assert_called_once_with(mock_test_context)
+
+    @patch.object(SensorTestRunner, '_set_initial_sensor_values', return_value=False)
+    def test_execute_internal_should_return_failure_when_sensor_setup_fails(self, mock_set_initial, mock_logger, mock_test_context):
+        """Test _execute_internal returns failure when initial sensor setup fails."""
         # Arrange
         runner = SensorTestRunner(mock_logger)
-        mock_simulate.return_value = False
-        
+
         # Act
         result = runner._execute_internal(mock_test_context)
-        
+
         # Assert
         assert result == TestResult.FAILURE
     
@@ -252,38 +251,28 @@ class TestFridaTestRunner:
         assert runner.can_run("network") is False
         assert runner.can_run("unknown") is False
     
-    @patch('TrigDroid_Infrastructure.test_runners.frida_test_runner.frida')
-    def test_execute_internal_should_load_and_run_frida_hooks(self, mock_frida, mock_logger, mock_test_context):
+    @patch.object(FridaTestRunner, '_start_app_with_frida', return_value=True)
+    def test_execute_internal_should_load_and_run_frida_hooks(self, mock_start, mock_logger, mock_test_context):
         """Test _execute_internal loads and runs Frida hooks."""
         # Arrange
         runner = FridaTestRunner(mock_logger)
-        mock_device = Mock()
-        mock_session = Mock()
-        mock_script = Mock()
-        
-        mock_frida.get_usb_device.return_value = mock_device
-        mock_device.attach.return_value = mock_session
-        mock_session.create_script.return_value = mock_script
-        
+
         # Act
         result = runner._execute_internal(mock_test_context)
-        
+
         # Assert
         assert result == TestResult.SUCCESS
-        mock_frida.get_usb_device.assert_called()
-        mock_session.create_script.assert_called()
-        mock_script.load.assert_called()
+        mock_start.assert_called_once_with(mock_test_context)
     
-    @patch('TrigDroid_Infrastructure.test_runners.frida_test_runner.frida')
-    def test_execute_internal_should_handle_frida_errors(self, mock_frida, mock_logger, mock_test_context):
+    @patch.object(FridaTestRunner, '_start_app_with_frida', side_effect=Exception("Frida error"))
+    def test_execute_internal_should_handle_frida_errors(self, mock_start, mock_logger, mock_test_context):
         """Test _execute_internal handles Frida errors gracefully."""
         # Arrange
         runner = FridaTestRunner(mock_logger)
-        mock_frida.get_usb_device.side_effect = Exception("Frida error")
-        
+
         # Act
         result = runner._execute_internal(mock_test_context)
-        
+
         # Assert
         assert result == TestResult.FAILURE
         mock_logger.error.assert_called()

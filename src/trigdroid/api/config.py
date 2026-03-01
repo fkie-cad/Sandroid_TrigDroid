@@ -100,10 +100,18 @@ class TestConfiguration:
     # Advanced options
     interaction: bool = False  # Enable UI interaction simulation
     no_unroot: bool = False
-    
+
+    # Timeout and verbosity
+    timeout: int = 300  # seconds
+    verbose: bool = False
+
     def __post_init__(self):
-        """Validate configuration after initialization."""
-        self._validate()
+        """Run initial validation (non-raising)."""
+        self._validation_errors: List[str] = []
+        try:
+            self._validate()
+        except ConfigurationError as e:
+            self._validation_errors = str(e).split(': ', 1)[1].split('; ') if ': ' in str(e) else [str(e)]
     
     def _validate(self) -> None:
         """Validate configuration values."""
@@ -143,47 +151,78 @@ class TestConfiguration:
     
     def is_valid(self) -> bool:
         """Check if configuration is valid.
-        
+
         Returns:
             True if valid, False otherwise
         """
-        try:
-            self._validate()
-            return True
-        except ConfigurationError:
-            return False
+        return len(self._validation_errors) == 0
     
     @property
     def validation_errors(self) -> List[str]:
         """Get list of validation errors.
-        
+
         Returns:
             List of validation error messages
         """
-        try:
-            self._validate()
-            return []
-        except ConfigurationError as e:
-            return str(e).split(': ', 1)[1].split('; ')
+        return list(self._validation_errors)
+
+    @property
+    def sensors(self) -> List[str]:
+        """Get list of enabled sensor types."""
+        sensor_map = {
+            'acceleration': 'accelerometer',
+            'gyroscope': 'gyroscope',
+            'light': 'light',
+            'pressure': 'pressure',
+        }
+        return [name for attr, name in sensor_map.items() if getattr(self, attr, 0) > 0]
+
+    @property
+    def network_states(self) -> List[str]:
+        """Get list of enabled network state types."""
+        states = []
+        if self.wifi is not None and self.wifi:
+            states.append('wifi')
+        if self.data is not None and self.data:
+            states.append('data')
+        if self.bluetooth is not None and self.bluetooth:
+            states.append('bluetooth')
+        return states
+
+    @property
+    def has_sensor_manipulation(self) -> bool:
+        """Check if any sensor manipulation is configured."""
+        return len(self.sensors) > 0
+
+    @property
+    def has_network_manipulation(self) -> bool:
+        """Check if any network manipulation is configured."""
+        return any(x is not None for x in [self.wifi, self.data, self.bluetooth])
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert configuration to dictionary.
-        
+
         Returns:
             Dictionary representation of configuration
         """
+        from dataclasses import MISSING
+
         result = {}
         for field_name, field_def in self.__dataclass_fields__.items():
             value = getattr(self, field_name)
-            
+
             # Convert enums to their values
             if hasattr(value, 'value'):
                 value = value.value
-            
+
             # Skip default values for cleaner output
-            if value != field_def.default and value != field_def.default_factory():
+            default = field_def.default
+            if default is MISSING and field_def.default_factory is not MISSING:
+                default = field_def.default_factory()
+
+            if default is not MISSING and value != default:
                 result[field_name] = value
-        
+
         return result
     
     def to_yaml(self, file_path: Optional[str] = None) -> str:
@@ -201,7 +240,15 @@ class TestConfiguration:
             Path(file_path).write_text(yaml_str)
             
         return yaml_str
-    
+
+    def to_yaml_file(self, file_path: str) -> None:
+        """Save configuration to YAML file.
+
+        Args:
+            file_path: Path to save YAML file
+        """
+        self.to_yaml(file_path=file_path)
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'TestConfiguration':
         """Create configuration from dictionary.

@@ -6,7 +6,7 @@ used during malware analysis and security testing.
 These bypasses are for authorized security testing purposes only.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Optional, Any
 
 
@@ -56,25 +56,7 @@ class SSLUnpinningConfig:
 
     def to_frida_config(self) -> Dict[str, Any]:
         """Convert to Frida hook configuration dictionary."""
-        return {
-            "enabled": self.enabled,
-            "use_custom_cert": self.use_custom_cert,
-            "custom_cert_path": self.custom_cert_path,
-            "bypass_okhttp": self.bypass_okhttp,
-            "bypass_okhttp3": self.bypass_okhttp3,
-            "bypass_trust_manager": self.bypass_trust_manager,
-            "bypass_webview_client": self.bypass_webview_client,
-            "bypass_conscrypt": self.bypass_conscrypt,
-            "bypass_network_security_config": self.bypass_network_security_config,
-            "bypass_trustkit": self.bypass_trustkit,
-            "bypass_appcelerator": self.bypass_appcelerator,
-            "bypass_phonegap": self.bypass_phonegap,
-            "bypass_ibm_worklight": self.bypass_ibm_worklight,
-            "bypass_cwac_netsecurity": self.bypass_cwac_netsecurity,
-            "bypass_cordova_advanced_http": self.bypass_cordova_advanced_http,
-            "bypass_netty": self.bypass_netty,
-            "bypass_appmattus_ct": self.bypass_appmattus_ct,
-        }
+        return asdict(self)
 
 
 @dataclass
@@ -107,17 +89,7 @@ class RootDetectionConfig:
 
     def to_frida_config(self) -> Dict[str, Any]:
         """Convert to Frida hook configuration dictionary."""
-        return {
-            "enabled": self.enabled,
-            "bypass_file_checks": self.bypass_file_checks,
-            "bypass_package_manager": self.bypass_package_manager,
-            "bypass_command_execution": self.bypass_command_execution,
-            "bypass_build_properties": self.bypass_build_properties,
-            "bypass_rootbeer": self.bypass_rootbeer,
-            "bypass_system_properties": self.bypass_system_properties,
-            "custom_blocked_paths": self.custom_blocked_paths,
-            "custom_blocked_packages": self.custom_blocked_packages,
-        }
+        return asdict(self)
 
 
 @dataclass
@@ -204,14 +176,7 @@ class FridaDetectionConfig:
 
     def to_frida_config(self) -> Dict[str, Any]:
         """Convert to Frida hook configuration dictionary."""
-        return {
-            "enabled": self.enabled,
-            "bypass_file_checks": self.bypass_file_checks,
-            "bypass_port_checks": self.bypass_port_checks,
-            "bypass_maps_checks": self.bypass_maps_checks,
-            "bypass_named_pipe_checks": self.bypass_named_pipe_checks,
-            "bypass_string_checks": self.bypass_string_checks,
-        }
+        return asdict(self)
 
 
 @dataclass
@@ -236,13 +201,7 @@ class DebugDetectionConfig:
 
     def to_frida_config(self) -> Dict[str, Any]:
         """Convert to Frida hook configuration dictionary."""
-        return {
-            "enabled": self.enabled,
-            "bypass_debug_class": self.bypass_debug_class,
-            "bypass_tracer_pid": self.bypass_tracer_pid,
-            "bypass_debuggable_flag": self.bypass_debuggable_flag,
-            "bypass_timing_checks": self.bypass_timing_checks,
-        }
+        return asdict(self)
 
 
 @dataclass
@@ -345,10 +304,4 @@ class BypassConfig:
         Returns:
             Dictionary representation of the bypass configuration.
         """
-        return {
-            "ssl_unpinning": self.ssl_unpinning.to_frida_config(),
-            "root_detection": self.root_detection.to_frida_config(),
-            "emulator_detection": self.emulator_detection.to_frida_config(),
-            "frida_detection": self.frida_detection.to_frida_config(),
-            "debug_detection": self.debug_detection.to_frida_config(),
-        }
+        return self.to_frida_config()

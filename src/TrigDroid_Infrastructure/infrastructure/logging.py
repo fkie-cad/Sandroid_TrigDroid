@@ -79,14 +79,14 @@ class StandardLogger(ILogger):
     @staticmethod
     def _convert_level(level: LogLevel) -> int:
         """Convert LogLevel enum to logging module level."""
-        level_map = {
-            LogLevel.DEBUG: logging.DEBUG,
-            LogLevel.INFO: logging.INFO,
-            LogLevel.WARNING: logging.WARNING,
-            LogLevel.ERROR: logging.ERROR,
-            LogLevel.CRITICAL: logging.CRITICAL
+        value_map = {
+            "DEBUG": logging.DEBUG,
+            "INFO": logging.INFO,
+            "WARNING": logging.WARNING,
+            "ERROR": logging.ERROR,
+            "CRITICAL": logging.CRITICAL,
         }
-        return level_map[level]
+        return value_map.get(level.value, logging.INFO)
 
 
 class FilteredLogger(ILogger):

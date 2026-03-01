@@ -13,14 +13,17 @@ from .config import TestConfiguration
 from .results import TestResult
 from .devices import DeviceManager, AndroidDevice
 from .quick_start import quick_test, validate_environment, setup_environment
+from .trigger_executor import TriggerExecutor, TriggerResult
 
 __all__ = [
     "TrigDroidAPI",
     "TestConfiguration",
-    "TestResult", 
+    "TestResult",
     "DeviceManager",
     "AndroidDevice",
     "quick_test",
     "validate_environment",
     "setup_environment",
+    "TriggerExecutor",
+    "TriggerResult",
 ]

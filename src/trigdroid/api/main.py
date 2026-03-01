@@ -13,6 +13,7 @@ from ..core.enums import LogLevel, TestPhase
 # Import the refactored core components (absolute imports for sibling package)
 from TrigDroid_Infrastructure.infrastructure.dependency_injection import configure_container, ServiceLocator
 from TrigDroid_Infrastructure.infrastructure.logging import LoggerFactory
+from TrigDroid_Infrastructure.interfaces import IApplicationOrchestrator
 from TrigDroid_Infrastructure.application.orchestrator import ApplicationOrchestrator
 
 
@@ -113,9 +114,6 @@ class TrigDroidAPI:
                 if not self._device:
                     raise DeviceError("Failed to connect to Android device")
             
-            # Create orchestrator
-            self._orchestrator = self._container.resolve(ApplicationOrchestrator)
-            
             self._initialized = True
             
         except Exception as e:
@@ -133,8 +131,12 @@ class TrigDroidAPI:
         """
         if not self._initialized:
             raise TrigDroidError("API not initialized. Use within context manager.")
-            
+
         try:
+            # Lazily resolve orchestrator on first test run
+            if not self._orchestrator:
+                self._orchestrator = self._container.resolve(IApplicationOrchestrator)
+
             self._logger.info("Starting TrigDroid test execution")
             
             # Setup phase
@@ -246,12 +248,9 @@ class TrigDroidAPI:
     def _cleanup(self) -> None:
         """Clean up resources."""
         try:
-            if self._orchestrator:
-                self._orchestrator.teardown()
-                
             if self._logger:
                 self._logger.info("TrigDroid API cleanup completed")
-                
+
         except Exception as e:
             if self._logger:
                 self._logger.warning(f"Error during cleanup: {e}")

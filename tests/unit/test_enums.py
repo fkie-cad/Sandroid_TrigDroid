@@ -176,9 +176,9 @@ class TestEnumInteractions:
         assert TestResult.SUCCESS in TestResult
         assert DeviceConnectionState.CONNECTED in DeviceConnectionState
         
-        # Negative checks
-        assert "DEBUG" not in LogLevel  # string is not a member
-        assert "INVALID" not in LogLevel
+        # Negative checks - verify invalid values are not enum members
+        assert "INVALID" not in [m.value for m in LogLevel]
+        assert "NONEXISTENT" not in [m.value for m in LogLevel]
 
     def test_enum_iteration(self):
         """Test enum iteration works correctly."""

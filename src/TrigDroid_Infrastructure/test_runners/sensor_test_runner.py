@@ -24,6 +24,9 @@ class SensorTestRunner(TestRunnerBase):
     """Test runner for sensor-based operations."""
     
     SUPPORTED_TESTS = [
+        "sensor",
+        "sensors",
+        "accelerometer",
         "sensor_rotation",
         "sensor_initial_values",
         "sensor_power_manipulation",
@@ -169,3 +172,32 @@ class SensorTestRunner(TestRunnerBase):
         """Convert normalized pressure value to actual sensor reading."""
         # Pressure sensor typically ranges from 300 to 1100 hPa
         return 300.0 + (normalized_value * 800.0)
+
+    def _simulate_sensor_changes(self, context: ITestContext) -> bool:
+        """Simulate sensor changes based on configuration."""
+        self._logger.info("Simulating sensor changes")
+        try:
+            if self._should_run_sensor_rotation(context):
+                return self._execute_sensor_rotation(context)
+            return True
+        except Exception as e:
+            self._logger.error(f"Sensor simulation failed: {e}")
+            return False
+
+    def _get_sensor_commands(self, sensor_type: str, level: int) -> list:
+        """Get ADB commands for sensor manipulation."""
+        sensor_name_map = {
+            "accelerometer": "acceleration",
+            "gyroscope": "gyroscope",
+            "light": "light",
+            "pressure": "pressure",
+            "magnetometer": "magnetic-field",
+        }
+        sensor_name = sensor_name_map.get(sensor_type, sensor_type)
+        commands = []
+        for i in range(level):
+            if sensor_type in ("accelerometer", "gyroscope"):
+                commands.append(f"emu sensor set {sensor_name} {i}:{i}:{i}")
+            else:
+                commands.append(f"emu sensor set {sensor_name} {i}")
+        return commands

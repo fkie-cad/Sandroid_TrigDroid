@@ -116,8 +116,6 @@ def advanced_test_configuration() -> TestConfiguration:
         data=True,
         bluetooth=True,
         frida_hooks=True,
-        sensors=["accelerometer", "gyroscope", "light", "pressure"],
-        network_states=["wifi", "data", "bluetooth"],
         install_dummy_apps=["com.dummy.app1", "com.dummy.app2"],
         grant_permissions=["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
         timeout=600,

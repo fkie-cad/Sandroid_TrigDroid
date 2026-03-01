@@ -110,7 +110,7 @@ class TestResult:
             test_name: Name of the test
             reason: Reason for skipping
         """
-        self.tests_skipped.append(test_name)
+        self.tests_skipped.append(f"{test_name}: {reason}")
     
     @property
     def total_tests(self) -> int:

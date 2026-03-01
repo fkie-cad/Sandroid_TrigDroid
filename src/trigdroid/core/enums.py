@@ -14,25 +14,25 @@ class LogLevel(Enum):
 
 class TestPhase(Enum):
     """Test execution phases."""
-    SETUP = "setup"
-    EXECUTION = "execution"
-    TEARDOWN = "teardown"
+    SETUP = "SETUP"
+    EXECUTION = "EXECUTION"
+    TEARDOWN = "TEARDOWN"
 
 
 class TestResult(Enum):
     """Test execution results."""
-    SUCCESS = "success"
-    FAILURE = "failure"
-    SKIPPED = "skipped"
-    ERROR = "error"
+    SUCCESS = "SUCCESS"
+    FAILURE = "FAILURE"
+    SKIPPED = "SKIPPED"
+    ERROR = "ERROR"
 
 
 class DeviceConnectionState(Enum):
     """Android device connection states."""
-    CONNECTED = "connected"
-    DISCONNECTED = "disconnected"
-    UNAUTHORIZED = "unauthorized"
-    OFFLINE = "offline"
+    CONNECTED = "CONNECTED"
+    DISCONNECTED = "DISCONNECTED"
+    UNAUTHORIZED = "UNAUTHORIZED"
+    OFFLINE = "OFFLINE"
 
 
 class SensorType(Enum):
